@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1A3D28">
+<title>Assiette Zen</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --g9:#0E2218;--g8:#1A3D28;--g7:#256B40;--g6:#35965C;
+  --g5:#52B87A;--g4:#80CF9C;--g3:#B5E5C8;--g2:#DCF3E7;--g1:#F1FAF5;
+  --amber:#F29030;--amber2:#FDE8C8;--amber3:#FFF4E6;
+  --blue:#4D87CF;--blue2:#DAE9F8;--blue3:#EEF5FD;
+  --teal:#2BAEAD;--teal2:#C5ECEC;--teal3:#EBF8F8;
+  --gold:#EAB830;--gold2:#F9EEC4;--gold3:#FEFAE9;
+  --red:#D93F3F;--red2:#FBDADA;--red3:#FEF2F2;
+  --purple:#7C5CBF;--purple2:#E8E0F8;--purple3:#F5F2FD;
+  --t1:#0C1F14;--t2:#2E5040;--t3:#7FA090;--t4:#B8D0C5;
+  --bg:#EEF5F1;--card:#FFFFFF;--border:#DDE9E3;
+  --rXL:26px;--rL:20px;--rM:14px;--rP:100px;
+  --s1:0 2px 8px rgba(14,34,24,.06);
+  --s2:0 6px 24px rgba(14,34,24,.10);
+  --s3:0 14px 48px rgba(14,34,24,.20);
+  --nav-h:68px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;-webkit-text-size-adjust:100%;}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--t1);min-height:100%;overflow-x:hidden;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 10px);}
+button{cursor:pointer;border:none;background:none;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+textarea,input{font-family:inherit;}
+
+/* ─── PROFILE SCREEN ─── */
+.ps{position:fixed;inset:0;z-index:200;
+  background:linear-gradient(148deg,var(--g9) 0%,var(--g8) 50%,var(--g7) 100%);
+  display:flex;align-items:center;justify-content:center;padding:24px;}
+.ps.off{display:none;}
+.ps-b1{position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
+.ps-b2{position:absolute;bottom:-40px;left:-30px;width:150px;height:150px;border-radius:50%;background:rgba(82,184,122,.10);}
+.ps-card{background:var(--card);border-radius:var(--rXL);padding:36px 26px;width:100%;max-width:320px;text-align:center;box-shadow:var(--s3);position:relative;z-index:1;}
+.ps-ico{font-size:56px;margin-bottom:14px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15));}
+.ps-title{font-size:22px;font-weight:900;color:var(--t1);margin-bottom:6px;}
+.ps-sub{font-size:14px;color:var(--t3);line-height:1.55;margin-bottom:28px;}
+.ps-inp{width:100%;border:2.5px solid var(--border);border-radius:var(--rM);padding:15px 16px;font-size:20px;font-weight:800;text-align:center;color:var(--t1);background:var(--bg);margin-bottom:16px;transition:border-color .2s;}
+.ps-inp:focus{outline:none;border-color:var(--g5);background:#FBFFFE;}
+.ps-inp::placeholder{color:var(--t4);font-weight:400;font-size:16px;}
+.ps-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--g8),var(--g6));color:#fff;border-radius:var(--rL);font-size:17px;font-weight:800;box-shadow:0 6px 20px rgba(26,61,40,.30);}
+.ps-btn:active{transform:scale(.97);}
+.ps-hint{font-size:12px;color:var(--t4);margin-top:12px;line-height:1.5;}
+
+/* ─── HEADER ─── */
+.hd{background:linear-gradient(148deg,var(--g9) 0%,var(--g8) 45%,var(--g7) 100%);
+  padding:calc(env(safe-area-inset-top,14px) + 18px) 22px 46px;position:relative;overflow:hidden;}
+.hd-b1{position:absolute;top:-50px;right:-30px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.05);}
+.hd-b2{position:absolute;bottom:10px;left:-40px;width:130px;height:130px;border-radius:50%;background:rgba(82,184,122,.12);}
+.hd::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;background:var(--bg);border-radius:60% 60% 0 0 / 100% 100% 0 0;}
+.hd-in{position:relative;z-index:1;text-align:center;padding-top:4px;}
+.hd-leaf{font-size:42px;line-height:1;margin-bottom:6px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));}
+.hd-name{font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;}
+.hd-name span{color:var(--g4);}
+.hd-tag{font-size:11px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:5px;}
+.pb{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;
+  display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.13);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);border-radius:var(--rP);padding:6px 12px 6px 8px;z-index:10;}
+.pb:active{background:rgba(255,255,255,.22);}
+.pb-ava{font-size:15px;}
+.pb-nm{font-size:12px;font-weight:800;color:#fff;max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sync{width:7px;height:7px;border-radius:50%;background:var(--g4);flex-shrink:0;animation:syncpulse 2.5s infinite;}
+.sync.warn{background:var(--amber);}.sync.off2{background:var(--t4);animation:none;}
+@keyframes syncpulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+/* ─── BOTTOM NAV ─── */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:var(--card);border-top:1px solid var(--border);
+  padding:0 8px calc(env(safe-area-inset-bottom,0px) + 8px) 8px;
+  display:flex;gap:4px;box-shadow:0 -4px 20px rgba(14,34,24,.08);}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 4px 6px;border-radius:var(--rM);transition:background .2s;}
+.bn.on{background:var(--g2);}
+.bn-ico{font-size:24px;line-height:1;}
+.bn-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;transition:color .2s;}
+.bn.on .bn-lbl{color:var(--g7);}
+
+/* ─── PAGES ─── */
+.page{display:none;}.page.on{display:block;}
+.w{max-width:430px;margin:0 auto;padding:18px 15px 0;}
+
+/* ─── TABS REPAS ─── */
+.tabs{display:flex;gap:9px;margin-bottom:18px;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:13px 6px 11px;border:2px solid var(--border);border-radius:var(--rXL);
+  background:var(--card);transition:all .32s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.tab::after{content:'';position:absolute;inset:0;background:linear-gradient(148deg,var(--g9),var(--g6));opacity:0;transition:opacity .32s;}
+.tab.on{border-color:transparent;box-shadow:0 8px 28px rgba(26,61,40,.30);transform:translateY(-3px) scale(1.02);}
+.tab.on::after{opacity:1;}
+.t-ico{font-size:28px;position:relative;z-index:1;}
+.t-lbl{font-size:11.5px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:var(--t2);position:relative;z-index:1;transition:color .25s;}
+.t-hr{font-size:10px;color:var(--t3);position:relative;z-index:1;transition:color .25s;}
+.tab.on .t-lbl{color:#fff;}.tab.on .t-hr{color:rgba(255,255,255,.65);}
+
+/* ─── PLATE CARD ─── */
+.pc{background:var(--card);border-radius:var(--rXL);padding:22px;box-shadow:var(--s2);border:1px solid var(--border);margin-bottom:14px;}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.pc-title{font-size:18px;font-weight:900;color:var(--t1);}
+.pc-sub{font-size:11px;color:var(--g6);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+.pc-pill{background:var(--g2);color:var(--g7);font-size:12px;font-weight:800;padding:6px 13px;border-radius:var(--rP);white-space:nowrap;border:1.5px solid var(--g3);}
+.dnut-wrap{width:200px;height:200px;margin:0 auto 20px;position:relative;flex-shrink:0;}
+.dnut-ring{width:100%;height:100%;border-radius:50%;box-shadow:0 4px 24px rgba(14,34,24,.12);transition:transform .22s ease,opacity .22s ease;}
+.dnut-hole{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:118px;height:118px;background:var(--card);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px rgba(14,34,24,.06);}
+.dnut-emoji{font-size:32px;line-height:1;}
+.dnut-lbl{font-size:9.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-top:5px;}
+.leg{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
+.leg-chip{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:var(--rP);padding:5px 12px;border:1px solid var(--border);}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.leg-nm{font-size:12px;color:var(--t2);font-weight:500;}
+.leg-pct{font-size:12px;color:var(--t1);font-weight:900;}
+
+/* ─── INPUT ─── */
+.inp-c{background:var(--card);border-radius:var(--rXL);padding:18px;box-shadow:var(--s1);border:1px solid var(--border);margin-bottom:13px;}
+.inp-h{font-size:14px;font-weight:800;color:var(--t1);margin-bottom:11px;display:flex;align-items:center;gap:8px;}
+.inp-f{width:100%;min-height:88px;border:2px solid var(--border);border-radius:var(--rM);padding:12px 14px;font-size:15px;line-height:1.6;color:var(--t1);background:var(--bg);resize:none;transition:border-color .2s,background .2s;}
+.inp-f:focus{outline:none;border-color:var(--g5);background:#FBFFFE;}
+.inp-f::placeholder{color:var(--t3);}
+.inp-hint{font-size:12px;color:var(--t3);margin-top:8px;display:flex;align-items:center;gap:5px;}
+
+/* ─── CTA ─── */
+.cta{width:100%;padding:18px;background:linear-gradient(135deg,var(--g8) 0%,var(--g6) 100%);color:#fff;border-radius:var(--rXL);font-size:17px;font-weight:900;box-shadow:0 8px 28px rgba(26,61,40,.38);display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;transition:transform .15s,box-shadow .15s,opacity .18s;}
+.cta:active{transform:scale(.97);}.cta:disabled{opacity:.55;pointer-events:none;}
+.dots{display:inline-flex;gap:5px;align-items:center;margin-left:6px;}
+.dots i{display:block;width:7px;height:7px;background:#fff;border-radius:50%;font-style:normal;animation:boing 1s infinite;}
+.dots i:nth-child(2){animation-delay:.17s;}.dots i:nth-child(3){animation-delay:.34s;}
+@keyframes boing{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-7px);}}
+
+/* ─── FEEDBACK ─── */
+.fbs{display:none;margin-bottom:22px;}
+.fbs.on{display:block;animation:popUp .45s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+.fbs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.fbs-title{font-size:17px;font-weight:900;color:var(--t1);}
+.sr-wrap{width:74px;height:74px;position:relative;flex-shrink:0;}
+.sr-wrap svg{position:absolute;inset:0;width:100%;height:100%;}
+.sr-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.sr-val{font-size:21px;font-weight:900;line-height:1;}
+.sr-den{font-size:10px;color:var(--t3);font-weight:600;margin-top:1px;}
+#scoreArc{transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1),stroke .3s ease;}
+.fbi{background:var(--card);border-radius:var(--rL);padding:14px 15px;margin-bottom:10px;border-left:4.5px solid;box-shadow:var(--s1);display:flex;gap:12px;align-items:flex-start;}
+.fbi.green{border-color:var(--g5);background:linear-gradient(to right,var(--g1),var(--card));}
+.fbi.orange{border-color:var(--amber);background:linear-gradient(to right,var(--amber3),var(--card));}
+.fbi.red{border-color:var(--red);background:linear-gradient(to right,var(--red3),var(--card));}
+.fbi-ico{font-size:22px;flex-shrink:0;margin-top:1px;}
+.fbi-bd{flex:1;}.fbi-h{font-size:13.5px;font-weight:800;color:var(--t1);margin-bottom:3px;}
+.fbi-t{font-size:13px;color:var(--t2);line-height:1.55;}
+.fbi-tip{background:linear-gradient(135deg,var(--g2),var(--g3));border:1.5px solid var(--g3);border-radius:var(--rL);padding:14px 16px;margin-top:12px;display:flex;gap:10px;align-items:flex-start;}
+.tip-ico{font-size:20px;flex-shrink:0;}
+.tip-txt{font-size:13px;font-weight:700;color:var(--g8);line-height:1.6;}
+
+/* ─── HISTORY ─── */
+.sec-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.sec-ttl{font-size:16px;font-weight:900;color:var(--t1);}
+.clr{font-size:12px;color:var(--t3);}.clr:active{color:var(--red);}
+.h-empty{text-align:center;padding:30px 16px;background:var(--card);border-radius:var(--rXL);border:2px dashed var(--border);}
+.h-ei{font-size:44px;margin-bottom:10px;}
+.h-et{font-size:14px;color:var(--t3);line-height:1.65;}
+.hi{background:var(--card);border-radius:var(--rL);padding:13px 14px;margin-bottom:9px;box-shadow:var(--s1);border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.hi-badge{width:46px;height:46px;border-radius:var(--rM);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.hi-info{flex:1;min-width:0;}
+.hi-nm{font-size:13px;font-weight:800;color:var(--t1);}
+.hi-fd{font-size:12px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.hi-sc{font-size:16px;font-weight:900;padding:5px 12px;border-radius:var(--rP);flex-shrink:0;}
+.sc-hi{background:var(--g2);color:var(--g7);}
+.sc-md{background:var(--gold2);color:#7A5400;}
+.sc-lo{background:var(--red2);color:var(--red);}
+
+/* ─── BILAN PAGE ─── */
+.bilan-hero{background:linear-gradient(135deg,var(--g8),var(--g6));border-radius:var(--rXL);padding:24px;margin-bottom:16px;text-align:center;color:#fff;box-shadow:var(--s2);}
+.bilan-hero-score{font-size:64px;font-weight:900;line-height:1;}
+.bilan-hero-lbl{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px;font-weight:600;}
+.bilan-hero-msg{font-size:15px;font-weight:700;color:var(--g3);margin-top:12px;line-height:1.5;}
+.bilan-meals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.bm{background:var(--card);border-radius:var(--rL);padding:14px 10px;text-align:center;border:1px solid var(--border);box-shadow:var(--s1);}
+.bm-ico{font-size:26px;margin-bottom:6px;}
+.bm-lbl{font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.bm-sc{font-size:20px;font-weight:900;margin-top:4px;}
+.bm-empty{font-size:13px;color:var(--t4);margin-top:4px;}
+
+/* Weekly chart */
+.week-card{background:var(--card);border-radius:var(--rXL);padding:20px;box-shadow:var(--s1);border:1px solid var(--border);margin-bottom:16px;}
+.week-title{font-size:15px;font-weight:900;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.week-chart{display:flex;align-items:flex-end;gap:6px;height:90px;}
+.wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.wc-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;}
+.wc-bar{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s cubic-bezier(.4,0,.2,1);}
+.wc-val{font-size:10px;font-weight:800;color:var(--t2);}
+.wc-day{font-size:10px;color:var(--t3);font-weight:600;}
+.wc-today .wc-day{color:var(--g6);font-weight:900;}
+.week-avg{text-align:center;margin-top:14px;font-size:13px;color:var(--t3);}
+.week-avg strong{color:var(--t1);font-size:16px;}
+
+/* ─── POIDS PAGE ─── */
+.poids-priv{background:linear-gradient(135deg,var(--purple3),var(--card));border:2px solid var(--purple2);border-radius:var(--rXL);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.poids-priv-ico{font-size:22px;}
+.poids-priv-txt{font-size:13px;color:var(--purple);font-weight:700;line-height:1.5;}
+.poids-entry{background:var(--card);border-radius:var(--rXL);padding:20px;box-shadow:var(--s2);border:1px solid var(--border);margin-bottom:16px;}
+.poids-entry-h{font-size:15px;font-weight:900;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.poids-row{display:flex;gap:10px;align-items:center;}
+.poids-inp{flex:1;border:2.5px solid var(--border);border-radius:var(--rM);padding:14px 16px;font-size:24px;font-weight:900;text-align:center;color:var(--t1);background:var(--bg);transition:border-color .2s;}
+.poids-inp:focus{outline:none;border-color:var(--g5);background:#FBFFFE;}
+.poids-unit{font-size:16px;color:var(--t3);font-weight:700;flex-shrink:0;}
+.poids-btn{padding:14px 20px;background:linear-gradient(135deg,var(--g8),var(--g6));color:#fff;border-radius:var(--rM);font-size:15px;font-weight:800;box-shadow:0 4px 16px rgba(26,61,40,.28);white-space:nowrap;}
+.poids-btn:active{transform:scale(.97);}
+.poids-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.ps2{background:var(--card);border-radius:var(--rL);padding:14px 10px;text-align:center;border:1px solid var(--border);box-shadow:var(--s1);}
+.ps2-lbl{font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.ps2-val{font-size:20px;font-weight:900;color:var(--t1);}
+.ps2-val.pos{color:var(--g6);}
+.ps2-val.neg{color:var(--red);}
+.ps2-sub{font-size:11px;color:var(--t3);margin-top:3px;}
+
+/* Weight SVG chart */
+.weight-chart-card{background:var(--card);border-radius:var(--rXL);padding:20px;box-shadow:var(--s1);border:1px solid var(--border);margin-bottom:16px;}
+.wcc-title{font-size:15px;font-weight:900;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+#weightSvg{width:100%;height:140px;overflow:visible;}
+.weight-hist{margin-top:14px;}
+.wh-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.wh-item:last-child{border-bottom:none;}
+.wh-date{font-size:13px;color:var(--t3);font-weight:600;}
+.wh-val{font-size:15px;font-weight:900;color:var(--t1);}
+.wh-delta{font-size:12px;font-weight:700;padding:3px 9px;border-radius:var(--rP);}
+.wh-delta.down{background:var(--g2);color:var(--g7);}
+.wh-delta.up{background:var(--red2);color:var(--red);}
+.wh-delta.eq{background:var(--bg);color:var(--t3);}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + 12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(60px);background:var(--t1);color:#fff;padding:12px 22px;border-radius:var(--rP);font-size:14px;font-weight:700;box-shadow:var(--s3);z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;}
+.toast.on{transform:translateX(-50%) translateY(0);}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--g3);border-radius:99px;}
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN PROFIL -->
+<div class="ps" id="ps">
+  <div class="ps-b1"></div><div class="ps-b2"></div>
+  <div class="ps-card">
+    <span class="ps-ico">🌿</span>
+    <h2 class="ps-title">Assiette Zen</h2>
+    <p class="ps-sub">Entrez votre prénom pour créer votre profil personnel.</p>
+    <input class="ps-inp" id="psInp" type="text" placeholder="Votre prénom…" maxlength="20" autocomplete="off">
+    <button class="ps-btn" onclick="setProfile()">C'est parti ! →</button>
+    <p class="ps-hint">Votre compagnon entrera son prénom sur son appareil — historiques séparés.</p>
+  </div>
+</div>
+
+<div id="app">
+  <header class="hd">
+    <div class="hd-b1"></div><div class="hd-b2"></div>
+    <div class="hd-in">
+      <span class="hd-leaf">🌿</span>
+      <h1 class="hd-name">Assiette <span>Zen</span></h1>
+      <p class="hd-tag" id="hdTag">Chrononutrition · IG Bas · Naturopathie</p>
+    </div>
+    <button class="pb" onclick="switchProfile()">
+      <span class="pb-ava">👤</span>
+      <span class="pb-nm" id="pbNm">—</span>
+      <span class="sync off2" id="syncDot"></span>
+    </button>
+  </header>
+
+  <!-- PAGE ASSIETTE -->
+  <div class="page on" id="pageAssiette">
+    <div class="w">
+      <div class="tabs">
+        <button class="tab on" data-m="MATIN" onclick="pick('MATIN')">
+          <span class="t-ico">🌅</span><span class="t-lbl">Matin</span><span class="t-hr">7h–10h</span>
+        </button>
+        <button class="tab" data-m="MIDI" onclick="pick('MIDI')">
+          <span class="t-ico">☀️</span><span class="t-lbl">Midi</span><span class="t-hr">12h–14h</span>
+        </button>
+        <button class="tab" data-m="COLLATION" onclick="pick('COLLATION')">
+          <span class="t-ico">🍎</span><span class="t-lbl">Collation</span><span class="t-hr">16h–17h</span>
+        </button>
+        <button class="tab" data-m="SOIR" onclick="pick('SOIR')">
+          <span class="t-ico">🌙</span><span class="t-lbl">Soir</span><span class="t-hr">19h–21h</span>
+        </button>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div>
+            <div class="pc-title" id="pcTitle">Assiette du Matin</div>
+            <div class="pc-sub" id="pcSub">Gras &amp; Protéiné · Zéro Sucre</div>
+          </div>
+          <div class="pc-pill" id="pcPill">🌅 Matin</div>
+        </div>
+        <div class="dnut-wrap">
+          <div class="dnut-ring" id="dnut"></div>
+          <div class="dnut-hole">
+            <span class="dnut-emoji" id="dnutEmo">🌅</span>
+            <span class="dnut-lbl">Idéal</span>
+          </div>
+        </div>
+        <div class="leg" id="leg"></div>
+      </div>
+      <div class="inp-c">
+        <div class="inp-h"><span>✍️</span><span id="inpH">Qu'allez-vous manger ce matin ?</span></div>
+        <textarea class="inp-f" id="txt" placeholder="Ex : 2 œufs brouillés, avocat, fromage de chèvre, café noir…" rows="3"></textarea>
+        <p class="inp-hint">💡 Listez vos aliments séparés par des virgules</p>
+      </div>
+      <button class="cta" id="cta" onclick="go()">
+        <span>🔍</span><span id="ctaTxt">Analyser mon assiette</span>
+      </button>
+      <section class="fbs" id="fbs">
+        <div class="fbs-top">
+          <div class="fbs-title">📊 Résultat</div>
+          <div class="sr-wrap">
+            <svg viewBox="0 0 74 74" fill="none">
+              <circle cx="37" cy="37" r="30" stroke="#DDE9E3" stroke-width="9"/>
+              <circle id="scoreArc" cx="37" cy="37" r="30" stroke="var(--g6)" stroke-width="9"
+                stroke-dasharray="188.5 188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 37 37)" stroke-linecap="round"/>
+            </svg>
+            <div class="sr-num"><span class="sr-val" id="srVal">—</span><span class="sr-den">/100</span></div>
+          </div>
+        </div>
+        <div id="fbItems"></div>
+      </section>
+      <section>
+        <div class="sec-row">
+          <div class="sec-ttl">📋 Repas du jour</div>
+          <button class="clr" onclick="clrH()">Effacer</button>
+        </div>
+        <div id="histEl"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- PAGE BILAN -->
+  <div class="page" id="pageBilan">
+    <div class="w">
+      <div class="bilan-hero" id="bilanHero">
+        <div class="bilan-hero-score" id="bilanScore">—</div>
+        <div class="bilan-hero-lbl">Score moyen aujourd'hui</div>
+        <div class="bilan-hero-msg" id="bilanMsg">Analysez vos repas pour voir votre bilan</div>
+      </div>
+      <div class="bilan-meals" id="bilanMeals"></div>
+      <div class="week-card">
+        <div class="week-title">📅 Cette semaine</div>
+        <div class="week-chart" id="weekChart"></div>
+        <div class="week-avg" id="weekAvg">Chargement…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE POIDS -->
+  <div class="page" id="pagePoids">
+    <div class="w">
+      <div class="poids-priv">
+        <span class="poids-priv-ico">🔒</span>
+        <span class="poids-priv-txt">Données personnelles — visibles uniquement par vous (<span id="poidsProfilNm">—</span>)</span>
+      </div>
+      <div class="poids-entry">
+        <div class="poids-entry-h">⚖️ Saisir mon poids du jour</div>
+        <div class="poids-row">
+          <input class="poids-inp" id="poidsInp" type="number" step="0.1" min="30" max="250" placeholder="68.5">
+          <span class="poids-unit">kg</span>
+          <button class="poids-btn" onclick="savePoids()">Enregistrer</button>
+        </div>
+      </div>
+      <div class="poids-stats" id="poidsStats"></div>
+      <div class="weight-chart-card" id="weightChartCard" style="display:none">
+        <div class="wcc-title">📈 Évolution du poids</div>
+        <svg id="weightSvg"></svg>
+        <div class="weight-hist" id="weightHist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bnav">
+    <button class="bn on" onclick="showPage('Assiette')" id="bn0">
+      <span class="bn-ico">🍽️</span><span class="bn-lbl">Assiette</span>
+    </button>
+    <button class="bn" onclick="showPage('Bilan')" id="bn1">
+      <span class="bn-ico">📊</span><span class="bn-lbl">Bilan</span>
+    </button>
+    <button class="bn" onclick="showPage('Poids')" id="bn2">
+      <span class="bn-ico">⚖️</span><span class="bn-lbl">Poids</span>
+    </button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ SUPABASE ══ */
+const SB = supabase.createClient(
+  'https://hvyfnaazyqaerhdeznrt.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2eWZuYWF6eXFhZXJoZGV6bnJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5ODM4MzMsImV4cCI6MjA5NjU1OTgzM30.7vznenJ0J0x3Xp_ByoYMhEpq870qlw2P2qING4w7mso'
+);
+
+/* ══ PROFIL ══ */
+let profil = localStorage.getItem('az_profil') || null;
+
+function setProfile(){
+  const v = document.getElementById('psInp').value.trim();
+  if(!v){ document.getElementById('psInp').style.borderColor='var(--red)'; return; }
+  profil = v;
+  localStorage.setItem('az_profil', v);
+  document.getElementById('ps').classList.add('off');
+  document.getElementById('pbNm').textContent = v;
+  document.getElementById('poidsProfilNm').textContent = v;
+  const h = new Date().getHours();
+  pick(h>=11&&h<15?'MIDI':h>=17?'SOIR':'MATIN');
+  rndrH();
+}
+function switchProfile(){
+  if(!confirm('Changer de profil ?')) return;
+  localStorage.removeItem('az_profil'); profil=null;
+  document.getElementById('psInp').value='';
+  document.getElementById('ps').classList.remove('off');
+}
+document.getElementById('psInp').addEventListener('keydown', e=>{ if(e.key==='Enter') setProfile(); });
+
+/* ══ NAVIGATION ══ */
+function showPage(name){
+  ['Assiette','Bilan','Poids'].forEach((n,i)=>{
+    document.getElementById('page'+n).classList.toggle('on', n===name);
+    document.getElementById('bn'+i).classList.toggle('on', n===name);
+  });
+  if(name==='Bilan') loadBilan();
+  if(name==='Poids') loadPoids();
+}
+
+/* ══ CONFIG REPAS ══ */
+const MC={
+  MATIN:{emoji:'🌅',label:'Matin',title:'Assiette du Matin',sub:'Gras & Protéiné · Zéro Sucre',pill:'🌅 Matin',bg:'#FFF6EB',
+    ih:"Qu'allez-vous manger ce matin ?",ph:'Ex : 2 œufs, avocat, fromage de chèvre, noix…',
+    segs:[{l:'Protéines',p:40,c:'#4D87CF'},{l:'Bons Lipides',p:50,c:'#F29030'},{l:'Glucides complexes',p:10,c:'#52B87A'}]},
+  MIDI:{emoji:'☀️',label:'Midi',title:'Assiette du Midi',sub:'Anti-Rétention · Potassium Végétal',pill:'☀️ Midi',bg:'#EEFAF4',
+    ih:"Qu'allez-vous manger à midi ?",ph:'Ex : poulet grillé, lentilles, haricots verts…',
+    segs:[{l:'Légumes',p:50,c:'#2BAEAD'},{l:'Protéines',p:25,c:'#4D87CF'},{l:'Féculents IG Bas',p:25,c:'#EAB830'}]},
+  COLLATION:{emoji:'🍎',label:'Collation',title:'Collation de 17h',sub:'Fruits & Oléagineux · Pic Insulinique',pill:'🍎 Collation',bg:'#FFF0F5',
+    ih:"Que prenez-vous en collation ?",ph:'Ex : pomme, amandes, noix, chocolat noir 70%…',
+    segs:[{l:'Fruits frais',p:60,c:'#E85D8A'},{l:'Oléagineux',p:30,c:'#F29030'},{l:'Chocolat noir',p:10,c:'#7C5CBF'}]},
+  SOIR:{emoji:'🌙',label:'Soir',title:'Assiette du Soir',sub:'Anti-Œdème · Zéro Stockage',pill:'🌙 Soir',bg:'#EEF2FF',
+    ih:"Qu'allez-vous manger ce soir ?",ph:'Ex : cabillaud vapeur, brocoli, courgettes…',
+    segs:[{l:'Légumes vapeur',p:70,c:'#35965C'},{l:'Protéines légères',p:20,c:'#4D87CF'},{l:'Lipides légers',p:10,c:'#F29030'}]}
+};
+
+/* ══ BASE ALIMENTAIRE ══ */
+const FDB={
+  proteins:['oeuf','oeufs','poulet','dinde','viande','boeuf','veau','porc','agneau','jambon','bacon','lardons','saumon','thon','sardine','maquereau','cabillaud','sole','truite','lieu','dorade','bar','crevette','crevettes','fruits de mer','fromage blanc','yaourt','skyr','cottage','ricotta','tofu','tempeh','steak','filet','emince'],
+  goodFats:['avocat','huile','noix','amande','amandes','cajou','noisette','noisettes','pistache','graines de lin','graines de chia','graines de sesame','ghee','olives','olive'],
+  veggies:['legume','legumes','salade','roquette','mache','endive','epinard','epinards','tomate','tomates','concombre','courgette','courgettes','carotte','carottes','brocoli','haricot vert','haricots verts','poireau','poireaux','asperge','asperges','radis','celeri','fenouil','chou','navet','betterave','artichaut','poivron','poivrons','aubergine','champignon','champignons','cresson','chou fleur','bette','potiron','courge','potimarron','soupe de legumes','soupe','minestrone','ratatouille','petits pois','wok','vapeur'],
+  lowIG:['lentille','lentilles','pois chiche','pois chiches','quinoa','patate douce','flocons d avoine','pain complet','pain de seigle','riz basmati','riz complet','sarrasin','epeautre','orge','boulgour','haricot rouge','haricots rouges','haricot blanc','haricots blancs','feve','edamame'],
+  highIG:['riz blanc','riz','pates','spaghetti','tagliatelle','macaroni','pain blanc','baguette','pain','pomme de terre','puree','frites','chips','semoule','couscous','mais','polenta','cereales','corn flakes','wrap','tortilla','brioche'],
+  sugars:['sucre','miel','confiture','chocolat','bonbon','gateau','cake','patisserie','croissant','pain au chocolat','biscuit','biscuits','viennoiserie','cookie','tarte','creme dessert','glace','sorbet','compote','sirop','coca','soda','jus de fruit','jus','limonade','nutella','caramel'],
+  fruits:['fruit','fruits','pomme','banane','orange','mandarine','fraise','fraises','framboise','framboises','raisin','mangue','ananas','kiwi','poire','peche','abricot','cerise','cerises','prune','melon','pasteque','figue','myrtille'],
+  dairy:['fromage','gruyere','emmental','camembert','brie','roquefort','comte','parmesan','mozzarella','feta','reblochon','chevre','creme fraiche','lait','creme'],
+  alcohol:['vin','biere','alcool','whisky','champagne','rose','pastis']
+};
+
+/* ══ RÈGLES ══ */
+const RULES={
+  MATIN:{
+    pos:[
+      {cat:'proteins',t:'green',h:'✅ Protéines au rendez-vous',b:'Les protéines au réveil activent la thermogenèse et stabilisent la glycémie pour toute la matinée.'},
+      {cat:'goodFats',t:'green',h:'✅ Bons lipides présents',b:'Les bons gras nourrissent le cerveau et préviennent la fringale de 11h sans pic d\'insuline.'},
+      {cat:'lowIG',t:'green',h:'✅ Glucides complexes IG bas',b:'Ces glucides libèrent leur énergie lentement, sans stress pour le pancréas.'}
+    ],
+    forb:[
+      {cat:'sugars',t:'red',h:'🔴 Sucres rapides détectés',b:'Le sucre le matin déclenche un pic d\'insuline dès 7h. Votre corps stocke immédiatement.'},
+      {cat:'highIG',t:'red',h:'🔴 Féculents IG élevé',b:'Pain blanc / riz blanc le matin = stockage immédiat. Réservez ce créneau aux graisses et protéines.'},
+      {cat:'fruits',t:'orange',h:'🟠 Fruits le matin',b:'Le fructose sollicite fortement le foie dès le réveil. Attendez 2h ou gardez-les pour la collation.'}
+    ],
+    miss:[
+      {cat:'proteins',t:'orange',h:'🟠 Manque de protéines',b:'Ajoutez 2 œufs, du fromage blanc ou du saumon fumé pour tenir jusqu\'à midi.'},
+      {cat:'goodFats',t:'orange',h:'🟠 Manque de bons lipides',b:'Ajoutez ½ avocat, une poignée de noix ou du ghee.'}
+    ],
+    tips:[
+      {c:r=>r.red>0,v:'💡 Assiette idéale du matin : 2 œufs + ½ avocat + fromage de chèvre + café noir.'},
+      {c:()=>true,v:'💡 Chrononutrition : le matin, zéro sucre = zéro stockage = énergie stable jusqu\'à midi.'}
+    ]
+  },
+  MIDI:{
+    pos:[
+      {cat:'veggies',t:'green',h:'✅ Légumes bien présents',b:'Le potassium végétal combat la rétention d\'eau et réduit l\'inflammation articulaire.'},
+      {cat:'lowIG',t:'green',h:'✅ Féculents IG bas',b:'Légumineuses et céréales IG bas régulent l\'insuline et nourrissent le microbiote.'},
+      {cat:'proteins',t:'green',h:'✅ Protéines équilibrées',b:'Les protéines du midi assurent la satiété jusqu\'au soir.'}
+    ],
+    forb:[
+      {cat:'sugars',t:'red',h:'🔴 Sucres détectés',b:'Le sucre à midi provoque un crash glycémique à 15h et stimule la rétention d\'eau.'},
+      {cat:'highIG',t:'orange',h:'🟠 Féculents IG élevé',b:'Préférez des lentilles ou du quinoa — votre énergie sera stable tout l\'après-midi.'}
+    ],
+    miss:[
+      {cat:'veggies',t:'orange',h:'🟠 Légumes insuffisants',b:'Les légumes doivent couvrir 50 % de l\'assiette du midi ! Votre meilleur drainage anti-œdème.'}
+    ],
+    tips:[
+      {c:r=>!r.veg,v:'💡 Assiette idéale du midi : ½ légumes colorés + ¼ protéines + ¼ lentilles.'},
+      {c:()=>true,v:'💡 Les légumes verts (brocoli, épinards, courgettes) réduisent l\'œdème et soulagent les articulations.'}
+    ]
+  },
+  COLLATION:{
+    pos:[
+      {cat:'fruits',t:'green',h:'✅ Fruits au bon moment !',b:'17h est le SEUL moment idéal pour les fruits. Le pic insulinique naturel brûle le fructose sans le stocker. Bravo !'},
+      {cat:'goodFats',t:'green',h:'✅ Oléagineux présents',b:'Amandes, noix, noisettes... Les bons gras ralentissent l\'absorption des sucres des fruits et rassasient jusqu\'au soir.'}
+    ],
+    forb:[
+      {cat:'sugars',t:'red',h:'🔴 Sucres industriels',b:'Gâteaux, viennoiseries, bonbons à 17h = stockage immédiat. Préférez des fruits frais et des noix.'},
+      {cat:'highIG',t:'orange',h:'🟠 Féculents en collation',b:'Pain, céréales à 17h gonflent inutilement. Gardez les féculents IG bas pour le midi.'},
+      {cat:'dairy',t:'orange',h:'🟠 Laitages en collation',b:'Le fromage à 17h alourdit la digestion du soir. Préférez les oléagineux.'}
+    ],
+    miss:[
+      {cat:'fruits',t:'orange',h:'🟠 Pas de fruits détectés',b:'La collation de 17h est le moment idéal pour les fruits ! Profitez-en : pomme, poire, amandes, noix.'}
+    ],
+    tips:[
+      {c:r=>r.red>0,v:'💡 Collation idéale : 1 fruit frais + une poignée d\'amandes ou noix + éventuellement 2 carrés de chocolat noir 70%.'},
+      {c:()=>true,v:'💡 Le pic insulinique de 17h est votre allié : c\'est le seul créneau où votre corps brûle naturellement les sucres des fruits sans les stocker !'}
+    ]
+  },
+  SOIR:{
+    pos:[
+      {cat:'veggies',t:'green',h:'✅ Légumes dominants',b:'Les légumes drainent les œdèmes et favorisent la récupération articulaire nocturne.'},
+      {cat:'proteins',t:'green',h:'✅ Protéines légères',b:'Une petite portion de protéines légères favorise la réparation sans surcharger le foie.'}
+    ],
+    forb:[
+      {cat:'highIG',t:'red',h:'🔴 Féculents le soir',b:'Le riz / pâtes font stocker l\'eau dans les tissus. Vos mains seront gonflées demain matin.'},
+      {cat:'lowIG',t:'red',h:'🔴 Féculents le soir',b:'Même IG bas, ils activent l\'insuline nocturne. Réservez-les pour le midi.'},
+      {cat:'sugars',t:'red',h:'🔴 Sucres le soir',b:'Le sucre le soir = stockage assuré. L\'insuline stocke sans retour possible pendant le sommeil.'},
+      {cat:'fruits',t:'red',h:'🔴 Fruits le soir',b:'Le fructose se transforme en triglycérides et aggrave l\'inflammation des mains.'},
+      {cat:'dairy',t:'red',h:'🔴 Fromage le soir',b:'Acide lactique + graisses saturées = double charge inflammatoire sur vos articulations.'}
+    ],
+    miss:[
+      {cat:'veggies',t:'orange',h:'🟠 Légumes insuffisants',b:'70 % de légumes le soir : soupe, vapeur, wok — mains légères garanties le matin !'}
+    ],
+    tips:[
+      {c:r=>r.red>0,v:'💡 Soir idéal : soupe de légumes + filet de cabillaud vapeur + herbes fraîches.'},
+      {c:()=>true,v:'💡 Entre 22h et 2h, vos articulations se réparent. Les légumes alcalinisants créent le terrain idéal.'}
+    ]
+  }
+};
+
+/* ══ HELPERS ══ */
+function norm(s){
+  return s.toLowerCase()
+    .replace(/[àâä]/g,'a').replace(/[éèêë]/g,'e')
+    .replace(/[îï]/g,'i').replace(/[ôö]/g,'o')
+    .replace(/[ùûü]/g,'u').replace(/ç/g,'c')
+    .replace(/œ/g,'oe').replace(/æ/g,'ae')
+    .replace(/[^a-z0-9 ]/g,' ');
+}
+function detect(txt){
+  const n=norm(txt),out={};
+  for(const [cat,kws] of Object.entries(FDB))
+    for(const kw of kws) if(n.includes(norm(kw))){ out[cat]=true; break; }
+  return out;
+}
+function setDonut(segs){
+  let s='',c=0;
+  segs.forEach(sg=>{ s+=`${sg.c} ${c}% ${c+sg.p}%,`; c+=sg.p; });
+  document.getElementById('dnut').style.background=`conic-gradient(from -90deg,${s.slice(0,-1)})`;
+}
+function setLeg(segs){
+  document.getElementById('leg').innerHTML=segs.map(s=>`
+    <div class="leg-chip"><div class="leg-dot" style="background:${s.c}"></div>
+    <span class="leg-nm">${s.l}</span><span class="leg-pct">${s.p}%</span></div>`).join('');
+}
+function setScore(n){
+  const C=188.5,arc=document.getElementById('scoreArc'),val=document.getElementById('srVal'),
+    col=n>=70?'var(--g6)':n>=50?'var(--amber)':'var(--red)';
+  arc.setAttribute('stroke',col);
+  arc.setAttribute('stroke-dashoffset',C*(1-n/100));
+  val.textContent=n; val.style.color=col;
+}
+function scoreColor(n){ return n>=70?'var(--g6)':n>=50?'var(--amber)':'var(--red)'; }
+
+/* ══ PICK MEAL ══ */
+let cur='MATIN';
+function pick(m){
+  cur=m;
+  const cfg=MC[m],ring=document.getElementById('dnut');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  document.getElementById('pcTitle').textContent=cfg.title;
+  document.getElementById('pcSub').textContent=cfg.sub;
+  document.getElementById('pcPill').textContent=cfg.pill;
+  document.getElementById('dnutEmo').textContent=cfg.emoji;
+  document.getElementById('inpH').textContent=cfg.ih;
+  document.getElementById('txt').placeholder=cfg.ph;
+  ring.style.transform='scale(.82)'; ring.style.opacity='0';
+  setTimeout(()=>{ setDonut(cfg.segs); setLeg(cfg.segs); ring.style.transform=''; ring.style.opacity=''; },170);
+  document.getElementById('fbs').classList.remove('on');
+  document.getElementById('txt').value='';
+}
+
+/* ══ ANALYSE ══ */
+function analyze(txt,m){
+  const det=detect(txt),R=RULES[m],items=[];
+  let score=55,reds=0;
+  for(const p of R.pos) if(det[p.cat]){ items.push({t:p.t,ico:'🟢',h:p.h,b:p.b}); score+=13; }
+  for(const f of R.forb){
+    if(det[f.cat]){
+      const isR=f.t==='red';
+      items.push({t:f.t,ico:isR?'🔴':'🟠',h:f.h,b:f.b});
+      score-=isR?22:10; if(isR) reds++;
+    }
+  }
+  for(const x of R.miss) if(!det[x.cat]){ items.push({t:x.t,ico:'🟠',h:x.h,b:x.b}); score-=12; }
+  if(!Object.keys(det).length){
+    items.push({t:'orange',ico:'🟠',h:'🟠 Aliments non reconnus',b:'Essayez d\'être plus précis : "œuf", "poulet", "lentilles"…'});
+    score=50;
+  }
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  const tipR=R.tips.find(t=>t.c({red:reds,veg:det.veggies}));
+  return {items,score,tip:tipR?tipR.v:null};
+}
+
+/* ══ GO ══ */
+async function go(){
+  const inp=document.getElementById('txt'),txt=inp.value.trim();
+  if(!txt){ inp.style.borderColor='var(--red)'; inp.focus(); setTimeout(()=>inp.style.borderColor='',1800); showToast('Décrivez d\'abord votre repas 🍽️'); return; }
+  const btn=document.getElementById('cta');
+  btn.disabled=true;
+  document.getElementById('ctaTxt').innerHTML='Analyse<span class="dots"><i></i><i></i><i></i></span>';
+  setTimeout(async()=>{
+    const {items,score,tip}=analyze(txt,cur);
+    setScore(score);
+    const el=document.getElementById('fbItems'); el.innerHTML='';
+    items.forEach(it=>{
+      const d=document.createElement('div'); d.className=`fbi ${it.t}`;
+      d.innerHTML=`<div class="fbi-ico">${it.ico}</div><div class="fbi-bd"><div class="fbi-h">${it.h}</div><div class="fbi-t">${it.b}</div></div>`;
+      el.appendChild(d);
+    });
+    if(tip){ const t=document.createElement('div'); t.className='fbi-tip'; t.innerHTML=`<span class="tip-ico">🌿</span><span class="tip-txt">${tip}</span>`; el.appendChild(t); }
+    const sec=document.getElementById('fbs'); sec.classList.add('on');
+    setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+    await saveH(txt,score);
+    btn.disabled=false; document.getElementById('ctaTxt').textContent='Analyser mon assiette';
+  },950);
+}
+
+/* ══ SUPABASE HISTORY ══ */
+function setSyncDot(s){ const d=document.getElementById('syncDot'); d.className='sync'+(s==='ok'?'':s==='warn'?' warn':' off2'); }
+
+async function saveH(foods,score){
+  const now=new Date();
+  const entry={profil,moment:cur,aliments:foods,score,heure:now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})};
+  try{ const {error}=await SB.from('repas').insert([entry]); if(error) throw error; setSyncDot('ok'); }
+  catch(e){ setSyncDot('warn'); let h=JSON.parse(localStorage.getItem('az_fb_'+profil)||'[]'); h.unshift({...entry,date:new Date().toLocaleDateString('fr-FR'),emoji:MC[cur].emoji,label:MC[cur].label}); localStorage.setItem('az_fb_'+profil,JSON.stringify(h.slice(0,12))); }
+  rndrH();
+}
+
+async function ldH(){
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    const {data,error}=await SB.from('repas').select('*').eq('profil',profil).gte('created_at',today+'T00:00:00Z').order('created_at',{ascending:false}).limit(12);
+    if(error) throw error; setSyncDot('ok');
+    return (data||[]).map(r=>({meal:r.moment,emoji:MC[r.moment]?.emoji||'🍽️',label:MC[r.moment]?.label||r.moment,bg:MC[r.moment]?.bg||'#f5f5f5',foods:r.aliments,score:r.score,time:r.heure}));
+  }catch(e){
+    setSyncDot('warn');
+    return JSON.parse(localStorage.getItem('az_fb_'+profil)||'[]').filter(x=>x.date===new Date().toLocaleDateString('fr-FR'));
+  }
+}
+
+async function rndrH(){
+  const h=await ldH(),el=document.getElementById('histEl');
+  if(!h.length){ el.innerHTML=`<div class="h-empty"><div class="h-ei">🍽️</div><div class="h-et">Aucun repas enregistré aujourd'hui.<br>Analysez votre première assiette !</div></div>`; return; }
+  el.innerHTML=h.map(x=>{ const cl=x.score>=70?'sc-hi':x.score>=50?'sc-md':'sc-lo'; return `<div class="hi"><div class="hi-badge" style="background:${x.bg||'#f0f0f0'}">${x.emoji}</div><div class="hi-info"><div class="hi-nm">${x.label} · ${x.time}</div><div class="hi-fd">${x.foods}</div></div><div class="hi-sc ${cl}">${x.score}</div></div>`; }).join('');
+}
+
+async function clrH(){
+  const today=new Date().toISOString().split('T')[0];
+  try{ await SB.from('repas').delete().eq('profil',profil).gte('created_at',today+'T00:00:00Z'); }catch{}
+  localStorage.removeItem('az_fb_'+profil); rndrH(); showToast('Historique effacé');
+}
+
+/* ══ BILAN ══ */
+async function loadBilan(){
+  const today=new Date().toISOString().split('T')[0];
+  let todayData=[];
+  try{
+    const {data}=await SB.from('repas').select('*').eq('profil',profil).gte('created_at',today+'T00:00:00Z');
+    todayData=data||[];
+  }catch{ todayData=JSON.parse(localStorage.getItem('az_fb_'+profil)||'[]').filter(x=>x.date===new Date().toLocaleDateString('fr-FR')); }
+
+  // Score du jour
+  const scores=todayData.map(r=>r.score||r.score);
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+  const heroEl=document.getElementById('bilanScore');
+  const msgEl=document.getElementById('bilanMsg');
+  if(avg!==null){
+    heroEl.textContent=avg;
+    heroEl.style.color=avg>=70?'#fff':avg>=50?'#FDE8C8':'#FBDADA';
+    msgEl.textContent=avg>=80?'🌟 Journée exemplaire ! Votre corps vous remercie.':avg>=70?'✨ Très bonne journée anti-inflammation !':avg>=50?'👍 Journée correcte — quelques ajustements possibles.':'⚠️ Journée difficile. Ce soir, misez sur les légumes vapeur !';
+  } else {
+    heroEl.textContent='—'; msgEl.textContent='Analysez vos repas pour voir votre bilan';
+  }
+
+  // Détail par repas
+  const byMeal={MATIN:null,MIDI:null,COLLATION:null,SOIR:null};
+  todayData.forEach(r=>{ if(!byMeal[r.moment]||r.score>byMeal[r.moment]) byMeal[r.moment]=r.score; });
+  document.getElementById('bilanMeals').innerHTML=Object.entries(MC).map(([m,cfg])=>{
+    const sc=byMeal[m];
+    return `<div class="bm"><div class="bm-ico">${cfg.emoji}</div><div class="bm-lbl">${cfg.label}</div>${sc!==null?`<div class="bm-sc" style="color:${scoreColor(sc)}">${sc}</div>`:`<div class="bm-empty">—</div>`}</div>`;
+  }).join('');
+
+  // Graphique semaine
+  await loadWeekChart();
+}
+
+async function loadWeekChart(){
+  const days=['L','M','M','J','V','S','D'];
+  const todayIdx=new Date().getDay(); // 0=dim
+  const results=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const de=ds+'T23:59:59Z';
+    try{
+      const {data}=await SB.from('repas').select('score').eq('profil',profil).gte('created_at',ds+'T00:00:00Z').lte('created_at',de);
+      const sc=(data||[]).map(r=>r.score);
+      results.push({date:d,avg:sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length):null,isToday:i===0});
+    }catch{ results.push({date:d,avg:null,isToday:i===0}); }
+  }
+  const maxSc=Math.max(...results.map(r=>r.avg||0),1);
+  const jours=['dim','lun','mar','mer','jeu','ven','sam'];
+  document.getElementById('weekChart').innerHTML=results.map(r=>{
+    const h=r.avg?Math.round((r.avg/100)*74):0;
+    const col=r.avg>=70?'var(--g5)':r.avg>=50?'var(--amber)':'var(--red)';
+    const lbl=jours[r.date.getDay()].substring(0,1).toUpperCase()+jours[r.date.getDay()].substring(1,2);
+    return `<div class="wc-col ${r.isToday?'wc-today':''}">
+      ${r.avg?`<div class="wc-val" style="color:${col}">${r.avg}</div>`:'<div class="wc-val">—</div>'}
+      <div class="wc-bar-wrap"><div class="wc-bar" style="height:${h}px;background:${r.avg?col:'var(--border)'}"></div></div>
+      <div class="wc-day">${lbl}</div>
+    </div>`;
+  }).join('');
+  const weekScores=results.filter(r=>r.avg!==null).map(r=>r.avg);
+  const weekAvg=weekScores.length?Math.round(weekScores.reduce((a,b)=>a+b,0)/weekScores.length):null;
+  document.getElementById('weekAvg').innerHTML=weekAvg?`Moyenne semaine : <strong style="color:${scoreColor(weekAvg)}">${weekAvg}/100</strong>`:'Aucune donnée cette semaine';
+}
+
+/* ══ POIDS ══ */
+async function savePoids(){
+  const val=parseFloat(document.getElementById('poidsInp').value);
+  if(!val||val<30||val>250){ showToast('Poids invalide'); return; }
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    // Supprimer entrée du jour si existante
+    await SB.from('poids').delete().eq('profil',profil).gte('created_at',today+'T00:00:00Z');
+    const {error}=await SB.from('poids').insert([{profil,valeur:val}]);
+    if(error) throw error;
+    setSyncDot('ok');
+  }catch{
+    setSyncDot('warn');
+    let p=JSON.parse(localStorage.getItem('az_poids_'+profil)||'[]');
+    p=p.filter(x=>x.date!==today);
+    p.push({date:today,valeur:val});
+    localStorage.setItem('az_poids_'+profil,JSON.stringify(p));
+  }
+  document.getElementById('poidsInp').value='';
+  showToast('Poids enregistré ✓');
+  loadPoids();
+}
+
+async function loadPoids(){
+  document.getElementById('poidsProfilNm').textContent=profil||'—';
+  let data=[];
+  try{
+    const {data:d,error}=await SB.from('poids').select('*').eq('profil',profil).order('created_at',{ascending:true}).limit(90);
+    if(error) throw error; data=d||[];
+  }catch{
+    data=JSON.parse(localStorage.getItem('az_poids_'+profil)||'[]').map(x=>({valeur:x.valeur,created_at:x.date}));
+  }
+  if(!data.length){
+    document.getElementById('poidsStats').innerHTML=`<div class="ps2" style="grid-column:1/-1"><div class="ps2-lbl">Aucune donnée</div><div class="ps2-val" style="font-size:14px;color:var(--t3)">Enregistrez votre premier poids</div></div>`;
+    document.getElementById('weightChartCard').style.display='none';
+    return;
+  }
+  const vals=data.map(d=>parseFloat(d.valeur));
+  const first=vals[0],last=vals[vals.length-1],delta=Math.round((last-first)*10)/10;
+  const min=Math.min(...vals),max=Math.max(...vals);
+  document.getElementById('poidsStats').innerHTML=`
+    <div class="ps2"><div class="ps2-lbl">Actuel</div><div class="ps2-val">${last}</div><div class="ps2-sub">kg</div></div>
+    <div class="ps2"><div class="ps2-lbl">Évolution</div><div class="ps2-val ${delta<0?'pos':delta>0?'neg':''}">${delta>0?'+':''}${delta}</div><div class="ps2-sub">kg total</div></div>
+    <div class="ps2"><div class="ps2-lbl">Tendance</div><div class="ps2-val" style="font-size:24px">${delta<-0.1?'📉':delta>0.1?'📈':'➡️'}</div></div>`;
+
+  // SVG weight chart
+  document.getElementById('weightChartCard').style.display='block';
+  const svg=document.getElementById('weightSvg');
+  const W=320,H=120,pad=30;
+  const n=Math.min(data.length,14);
+  const recent=data.slice(-n);
+  const rv=recent.map(d=>parseFloat(d.valeur));
+  const mn=Math.min(...rv)-0.5,mx=Math.max(...rv)+0.5;
+  const x=i=>pad+(i/(n-1||1))*(W-2*pad);
+  const y=v=>H-pad-(v-mn)/(mx-mn||1)*(H-2*pad);
+  const pts=rv.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  const area=`M${x(0)},${H-pad} `+rv.map((v,i)=>`L${x(i)},${y(v)}`).join(' ')+` L${x(n-1)},${H-pad} Z`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.innerHTML=`
+    <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--g5)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--g5)" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#wg)"/>
+    <polyline points="${pts}" fill="none" stroke="var(--g6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${rv.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--g6)" stroke="white" stroke-width="2"/>`).join('')}
+    <text x="${x(0)}" y="${H-8}" font-size="10" fill="var(--t3)" text-anchor="middle">${recent[0]?.created_at?.split('T')[0]?.split('-').slice(1).join('/')}</text>
+    ${n>1?`<text x="${x(n-1)}" y="${H-8}" font-size="10" fill="var(--t3)" text-anchor="middle">${recent[n-1]?.created_at?.split('T')[0]?.split('-').slice(1).join('/')}</text>`:''}`;
+
+  // Historique récent (5 derniers)
+  const hist=data.slice(-5).reverse();
+  document.getElementById('weightHist').innerHTML=hist.map((d,i)=>{
+    const prev=hist[i+1];
+    const dt=prev?Math.round((parseFloat(d.valeur)-parseFloat(prev.valeur))*10)/10:null;
+    const dcl=dt===null?'eq':dt<0?'down':'up';
+    const dlbl=dt===null?'—':dt<0?`${dt} kg`:dt>0?`+${dt} kg`:'=';
+    const dateStr=d.created_at?.split('T')[0]||d.date||'';
+    return `<div class="wh-item"><div class="wh-date">${dateStr}</div><div class="wh-val">${d.valeur} kg</div><div class="wh-delta ${dcl}">${dlbl}</div></div>`;
+  }).join('');
+}
+
+/* ══ TOAST ══ */
+let _tt=null;
+function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('on'); clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('on'),2600); }
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded',()=>{
+  if(profil){
+    document.getElementById('ps').classList.add('off');
+    document.getElementById('pbNm').textContent=profil;
+    document.getElementById('poidsProfilNm').textContent=profil;
+    const h=new Date().getHours();
+    pick(h>=11&&h<15?'MIDI':h>=15&&h<17?'COLLATION':h>=17?'SOIR':'MATIN');
+    rndrH();
+  }
+});
+
+// PWA manifest
+(()=>{
+  const m={name:'Assiette Zen',short_name:'Assiette Zen',start_url:'./',display:'standalone',background_color:'#EEF5F1',theme_color:'#1A3D28',icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌿%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'}]};
+  const l=document.createElement('link'); l.rel='manifest'; l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'})); document.head.appendChild(l);
+})();
+</script>
+</body>
+</html>
